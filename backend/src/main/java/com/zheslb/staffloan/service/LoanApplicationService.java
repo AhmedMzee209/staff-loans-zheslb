@@ -1,0 +1,84 @@
+package com.zheslb.staffloan.service;
+
+import com.zheslb.staffloan.dto.request.LoanApplicationRequestDTO;
+import com.zheslb.staffloan.dto.response.LoanApplicationResponseDTO;
+import com.zheslb.staffloan.model.LoanApplication;
+import com.zheslb.staffloan.enums.LoanStatus;
+import com.zheslb.staffloan.exception.ResourceNotFoundException;
+import com.zheslb.staffloan.repository.LoanApplicationRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class LoanApplicationService {
+
+    private final LoanApplicationRepository loanApplicationRepository;
+
+    public LoanApplicationResponseDTO create(LoanApplicationRequestDTO requestDTO) {
+        LoanApplication application = mapToEntity(requestDTO);
+        application.setStatus(LoanStatus.DRAFT);
+        application.setCreatedAt(Instant.now());
+        application.setUpdatedAt(Instant.now());
+
+        LoanApplication saved = loanApplicationRepository.save(application);
+        return mapToResponseDTO(saved);
+    }
+
+    public LoanApplicationResponseDTO update(UUID applicationId, LoanApplicationRequestDTO requestDTO) {
+        LoanApplication existing = loanApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Loan application not found"));
+
+        existing.setStatus(requestDTO.getStatus());
+        existing.setCurrentStageId(requestDTO.getCurrentStageId());
+        existing.setUpdatedAt(Instant.now());
+
+        LoanApplication updated = loanApplicationRepository.save(existing);
+        return mapToResponseDTO(updated);
+    }
+
+    public List<LoanApplicationResponseDTO> getAll() {
+        return loanApplicationRepository.findAll()
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public LoanApplicationResponseDTO getById(UUID applicationId) {
+        LoanApplication application = loanApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Loan application not found"));
+
+        return mapToResponseDTO(application);
+    }
+
+    public void delete(UUID applicationId) {
+        if (!loanApplicationRepository.existsById(applicationId)) {
+            throw new ResourceNotFoundException("Loan application not found");
+        }
+        loanApplicationRepository.deleteById(applicationId);
+    }
+
+    private LoanApplication mapToEntity(LoanApplicationRequestDTO requestDTO) {
+        return LoanApplication.builder()
+                .staffId(requestDTO.getStaffId())
+                .currentStageId(requestDTO.getCurrentStageId())
+                .status(requestDTO.getStatus())
+                .build();
+    }
+
+    private LoanApplicationResponseDTO mapToResponseDTO(LoanApplication application) {
+        return LoanApplicationResponseDTO.builder()
+                .applicationId(application.getApplicationId())
+                .staffId(application.getStaffId())
+                .currentStageId(application.getCurrentStageId())
+                .status(application.getStatus())
+                .createdAt(application.getCreatedAt())
+                .updatedAt(application.getUpdatedAt())
+                .build();
+    }
+}
