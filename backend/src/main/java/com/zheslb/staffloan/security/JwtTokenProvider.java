@@ -6,6 +6,9 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -31,12 +34,28 @@ public class JwtTokenProvider {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
         Date expiryDate = new Date(System.currentTimeMillis() + jwtExpirationTime);
 
+        // Add authorities/roles to claims
+        List<String> roles = userPrincipal.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(String::trim)
+                .collect(Collectors.toList());
+
         return Jwts.builder()
                 .subject(userPrincipal.getUsername())
+                .claim("roles", roles)
                 .issuedAt(new Date())
                 .expiration(expiryDate)
                 .signWith(key)
                 .compact();
+    }
+
+    public List<String> getRolesFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("roles", List.class);
     }
 
     public String generateTokenFromUsername(String username) {

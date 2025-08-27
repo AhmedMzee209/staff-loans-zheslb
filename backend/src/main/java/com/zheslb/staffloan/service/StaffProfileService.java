@@ -1,3 +1,4 @@
+
 package com.zheslb.staffloan.service;
 
 import com.zheslb.staffloan.dto.StaffProfileDto;
@@ -19,6 +20,13 @@ public class StaffProfileService {
 
     private final StaffProfileRepository staffProfileRepository;
     private final UserRepository userRepository;
+
+    // Get by user ID
+    public StaffProfileDto getProfileByUserId(UUID userId) {
+        StaffProfile profile = staffProfileRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
+        return mapEntityToDto(profile);
+    }
 
     // Create StaffProfile
     public StaffProfileDto createProfile(StaffProfileDto dto) {

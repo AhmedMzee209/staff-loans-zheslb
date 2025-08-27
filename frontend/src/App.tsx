@@ -55,17 +55,11 @@ const RoleRoute: React.FC<{ role: string; children: React.ReactNode }> = ({
   );
 };
 
+
 // Main App Component
 const AppContent: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
-
-  if (!isAuthenticated || !user) {
-    return <Login />;
-  }
-
-  // Redirect to appropriate dashboard based on user role
-  const dashboardPath = authService.getDashboardPath();
-  return <Navigate to={dashboardPath} replace />;
+  // Always show login page at root path
+  return <Login />;
 };
 
 const App: React.FC = () => {
@@ -150,11 +144,11 @@ const App: React.FC = () => {
           />
         
           
-          {/* Default route - redirect to appropriate dashboard */}
-          <Route path="/" element={<AppContent />} />
-          
-          {/* Catch all - redirect to appropriate dashboard */}
-          <Route path="*" element={<AppContent />} />
+          {/* Default route - always show login page */}
+          <Route path="/" element={<Login />} />
+
+          {/* Catch all - redirect to login */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

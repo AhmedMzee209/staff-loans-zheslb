@@ -10,5 +10,5 @@ public interface LoanApplicationRepository extends JpaRepository<LoanApplication
 
     List<LoanApplication> findByStaffId(UUID staffId);
 
-    List<LoanApplication> findByStatus(String status);
+    List<LoanApplication> findByStatus(com.zheslb.staffloan.enums.LoanStatus status);
 }

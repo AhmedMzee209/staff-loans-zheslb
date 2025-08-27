@@ -14,7 +14,6 @@ com/zheslb/staffloan/model/Contract.class
 com/zheslb/staffloan/dto/StaffProfileDto.class
 com/zheslb/staffloan/dto/request/LoanApplicationRequestDTO$LoanApplicationRequestDTOBuilder.class
 com/zheslb/staffloan/service/AuditLogService$AuditLogStats.class
-com/zheslb/staffloan/controller/StaffProfileController.class
 com/zheslb/staffloan/dto/response/AuthResponseDTO.class
 com/zheslb/staffloan/dto/UserResponseDTO.class
 com/zheslb/staffloan/repository/ContractRepository.class
@@ -37,10 +36,12 @@ com/zheslb/staffloan/model/User.class
 com/zheslb/staffloan/dto/request/RegisterRequestDTO.class
 com/zheslb/staffloan/model/StaffProfile.class
 com/zheslb/staffloan/model/StaffApproval$StaffApprovalBuilder.class
+com/zheslb/staffloan/service/AdminStatsService.class
 com/zheslb/staffloan/config/OpenApiConfig.class
 com/zheslb/staffloan/dto/response/StaffApprovalResponseDTO$StaffApprovalResponseDTOBuilder.class
 com/zheslb/staffloan/controller/RoleController.class
 com/zheslb/staffloan/exception/ResourceNotFoundException.class
+com/zheslb/staffloan/controller/AdminStatsController.class
 com/zheslb/staffloan/enums/StageStatus.class
 com/zheslb/staffloan/dto/request/DocumentRequestDTO.class
 com/zheslb/staffloan/dto/request/StaffApprovalRequestDTO$StaffApprovalRequestDTOBuilder.class
@@ -67,6 +68,7 @@ com/zheslb/staffloan/model/ContractVersion.class
 com/zheslb/staffloan/service/ContractService.class
 com/zheslb/staffloan/dto/ApprovalStageResponseDto.class
 com/zheslb/staffloan/StaffloanApplication.class
+com/zheslb/staffloan/dto/response/AdminStatsResponseDTO$AdminStatsResponseDTOBuilder.class
 com/zheslb/staffloan/service/AuthService.class
 com/zheslb/staffloan/controller/DocumentController.class
 com/zheslb/staffloan/dto/StaffApprovalResponseDto.class
@@ -82,8 +84,8 @@ com/zheslb/staffloan/config/WebConfig.class
 com/zheslb/staffloan/dto/request/LoanApplicationDetailsRequestDTO.class
 com/zheslb/staffloan/controller/StaffApprovalController.class
 com/zheslb/staffloan/repository/LoanApplicationDetailsRepository.class
+com/zheslb/staffloan/dto/response/AdminStatsResponseDTO.class
 com/zheslb/staffloan/dto/response/LoanApplicationResponseDTO.class
-com/zheslb/staffloan/service/StaffProfileService.class
 com/zheslb/staffloan/model/Role.class
 com/zheslb/staffloan/security/CustomUserDetailsService.class
 com/zheslb/staffloan/dto/request/AuditLogRequestDTO$AuditLogRequestDTOBuilder.class

@@ -2,6 +2,7 @@
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/config/OpenApiConfig.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/config/SecurityConfig.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/config/WebConfig.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/AdminStatsController.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/ApprovalStageController.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/AuditLogController.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/AuthController.java
@@ -35,6 +36,7 @@
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/request/LoginRequestDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/request/RegisterRequestDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/request/StaffApprovalRequestDTO.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/AdminStatsResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/ApprovalStageResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/AuditLogResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/AuthResponseDTO.java
@@ -75,6 +77,7 @@
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/security/CustomUserDetailsService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/security/JwtAuthenticationFilter.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/security/JwtTokenProvider.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/AdminStatsService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/ApprovalStageService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/AuditLogService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/AuthService.java

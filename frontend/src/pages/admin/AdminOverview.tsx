@@ -1,20 +1,41 @@
-import React from 'react';
-import { Users, FileText, Clock, TrendingUp, UserPlus, Shield, Settings, Eye } from 'lucide-react';
-// 
+
+import React, { useEffect, useState } from 'react';
+import { Users, FileText, Clock, TrendingUp, UserPlus, Shield, Settings } from 'lucide-react';
+import { getAdminStats, AdminStats } from '../../services/adminStatsService';
 
 interface AdminOverviewProps {
   onShowUserModal: () => void;
   onShowRoleModal: () => void;
 }
 
-const AdminOverview: React.FC<AdminOverviewProps> = ({ onShowUserModal, onShowRoleModal }) => {
-  // Placeholder data - will be replaced with real API calls
-  const totalApplications = 0;
-  const pendingApplications = 0;
-  const approvedApplications = 0;
-  const totalUsers = 0;
-  const activeUsers = 0;
 
+const AdminOverview: React.FC<AdminOverviewProps> = ({ onShowUserModal, onShowRoleModal }) => {
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getAdminStats();
+        setStats(data);
+      } catch (err: any) {
+        setError(err?.message || 'Failed to load stats');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return <div className="p-8 text-center text-gray-500">Loading admin stats...</div>;
+  }
+  if (error) {
+    return <div className="p-8 text-center text-red-500">{error}</div>;
+  }
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
@@ -26,8 +47,8 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ onShowUserModal, onShowRo
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">{totalUsers}</p>
-              <p className="text-xs text-green-600">+2 this month</p>
+              <p className="text-2xl font-bold text-gray-900">{stats?.totalUsers ?? 0}</p>
+              <p className="text-xs text-green-600">+{stats?.newUsersThisMonth ?? 0} this month</p>
             </div>
           </div>
         </div>
@@ -38,8 +59,8 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ onShowUserModal, onShowRo
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Total Applications</p>
-              <p className="text-2xl font-bold text-gray-900">{totalApplications}</p>
-              <p className="text-xs text-green-600">+5 this week</p>
+              <p className="text-2xl font-bold text-gray-900">{stats?.totalApplications ?? 0}</p>
+              <p className="text-xs text-green-600">+{stats?.newApplicationsThisMonth ?? 0} this month</p>
             </div>
           </div>
         </div>
@@ -50,7 +71,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ onShowUserModal, onShowRo
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Pending Review</p>
-              <p className="text-2xl font-bold text-gray-900">{pendingApplications}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats?.pendingReviews ?? 0}</p>
               <p className="text-xs text-yellow-600">Needs attention</p>
             </div>
           </div>
@@ -63,7 +84,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ onShowUserModal, onShowRo
             <div className="ml-4">
               <p className="text-sm text-gray-600">Approval Rate</p>
               <p className="text-2xl font-bold text-gray-900">
-                {totalApplications > 0 ? Math.round((approvedApplications / totalApplications) * 100) : 0}%
+                {stats ? Math.round(stats.approvalRate) : 0}%
               </p>
               <p className="text-xs text-green-600">+12% from last month</p>
             </div>

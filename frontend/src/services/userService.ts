@@ -11,20 +11,19 @@ export interface UpdateUserRequest extends Partial<CreateUserRequest> {
   id: string;
 }
 
+// Add missing fields to UserProfile interface for strict typing
 export interface UserProfile {
   id: string;
   userId: string;
   firstName: string;
   lastName: string;
-  nationalId: string;
-  phoneNumber: string;
-  address: string;
   department: string;
   position: string;
-  employmentDate: string;
-  salary: number;
-  emergencyContact: string;
-  emergencyPhone: string;
+  zanzibarId: string;
+  salaryNumber: string;
+  zssfNumber: string;
+  userEmail?: string;
+  // ...other fields as needed
 }
 
 // Backend DTO shape for /users endpoints
@@ -50,6 +49,11 @@ function mapBackendUser(dto: BackendUserResponseDTO): User {
 }
 
 class UserService {
+  // Create staff profile
+  // Create staff profile
+  async createStaffProfile(profileData: Partial<UserProfile>): Promise<UserProfile> {
+    return apiService.post<UserProfile>(`/staff-profiles`, profileData);
+  }
   // Get all users (admin only)
   async getAllUsers(): Promise<User[]> {
     const data = await apiService.get<BackendUserResponseDTO[]>('/users');
@@ -85,14 +89,14 @@ class UserService {
     return apiService.delete<void>(`/users/${id}`);
   }
 
-  // Get user profile
+  // Get user profile by userId (uses new backend endpoint)
   async getUserProfile(userId: string): Promise<UserProfile> {
-    return apiService.get<UserProfile>(`/users/${userId}/profile`);
+    return apiService.get<UserProfile>(`/staff-profiles/user/${userId}`);
   }
 
-  // Update user profile
-  async updateUserProfile(userId: string, profileData: Partial<UserProfile>): Promise<UserProfile> {
-    return apiService.put<UserProfile>(`/users/${userId}/profile`, profileData);
+  // Update user profile (still uses profileId, not userId)
+  async updateUserProfile(profileId: string, profileData: Partial<UserProfile>): Promise<UserProfile> {
+    return apiService.put<UserProfile>(`/staff-profiles/${profileId}`, profileData);
   }
 
   // Get users by role
@@ -140,4 +144,4 @@ class UserService {
 }
 
 export const userService = new UserService();
-export default userService; 
+export default userService;

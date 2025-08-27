@@ -11,6 +11,8 @@ public interface StaffProfileRepository extends JpaRepository<StaffProfile, UUID
 
     Optional<StaffProfile> findByUser(User user);
 
+    Optional<StaffProfile> findByUser_UserId(UUID userId);
+
     boolean existsByZanzibarId(String zanzibarId);
 
     boolean existsByUser(User user);
