@@ -14,6 +14,7 @@ com/zheslb/staffloan/model/Contract.class
 com/zheslb/staffloan/dto/StaffProfileDto.class
 com/zheslb/staffloan/dto/request/LoanApplicationRequestDTO$LoanApplicationRequestDTOBuilder.class
 com/zheslb/staffloan/service/AuditLogService$AuditLogStats.class
+com/zheslb/staffloan/controller/StaffProfileController.class
 com/zheslb/staffloan/dto/response/AuthResponseDTO.class
 com/zheslb/staffloan/dto/UserResponseDTO.class
 com/zheslb/staffloan/repository/ContractRepository.class
@@ -86,6 +87,7 @@ com/zheslb/staffloan/controller/StaffApprovalController.class
 com/zheslb/staffloan/repository/LoanApplicationDetailsRepository.class
 com/zheslb/staffloan/dto/response/AdminStatsResponseDTO.class
 com/zheslb/staffloan/dto/response/LoanApplicationResponseDTO.class
+com/zheslb/staffloan/service/StaffProfileService.class
 com/zheslb/staffloan/model/Role.class
 com/zheslb/staffloan/security/CustomUserDetailsService.class
 com/zheslb/staffloan/dto/request/AuditLogRequestDTO$AuditLogRequestDTOBuilder.class

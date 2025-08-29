@@ -51,4 +51,7 @@ public class StaffProfileDto {
     @NotBlank(message = "ZSSF number is required")
     @Size(max = 50)
     private String zssfNumber;
+
+    @Schema(description = "Profile image file name (JPG, 120x150px)", example = "profile_123.jpg")
+    private String profileImage;
 }

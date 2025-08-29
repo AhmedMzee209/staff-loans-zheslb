@@ -73,6 +73,7 @@
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/RoleRepository.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/StaffApprovalRepository.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/StaffProfileRepository.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/StaffProfileRepositoryCustom.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/UserRepository.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/security/CustomUserDetailsService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/security/JwtAuthenticationFilter.java

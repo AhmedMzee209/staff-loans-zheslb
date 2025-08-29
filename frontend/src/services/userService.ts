@@ -23,6 +23,7 @@ export interface UserProfile {
   salaryNumber: string;
   zssfNumber: string;
   userEmail?: string;
+  profileImage?: string; // file name or URL
   // ...other fields as needed
 }
 
@@ -49,6 +50,13 @@ function mapBackendUser(dto: BackendUserResponseDTO): User {
 }
 
 class UserService {
+  // Upload profile image (JPG, 120x150px)
+  async uploadProfileImage(profileId: string, file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    // Returns file name string
+    return apiService.upload<string>(`/staff-profiles/${profileId}/upload-image`, formData);
+  }
   // Create staff profile
   // Create staff profile
   async createStaffProfile(profileData: Partial<UserProfile>): Promise<UserProfile> {

@@ -9,6 +9,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+// For image validation
+import org.hibernate.validator.constraints.Length;
+import org.springframework.web.multipart.MultipartFile;
+
 @Entity
 @Table(name = "staff_profiles")
 @Getter
@@ -57,6 +61,10 @@ public class StaffProfile {
     @Column(name = "zssf_number", nullable = false, length = 50)
     @Schema(description = "ZSSF (Zanzibar Social Security Fund) number", example = "ZSSF987654321")
     private String zssfNumber;
+
+    @Column(name = "profile_image", length = 255)
+    @Schema(description = "Profile image file name (JPG, 120x150px)", example = "profile_123.jpg")
+    private String profileImage;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

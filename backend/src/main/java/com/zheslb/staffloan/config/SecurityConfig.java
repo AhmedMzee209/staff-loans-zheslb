@@ -31,27 +31,29 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
-                        .cors() // Enable CORS
-                        .and()
-                        .csrf(csrf -> csrf.disable())
-                        .sessionManagement(session -> session
-                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                        .authorizeHttpRequests(auth -> auth
-                                // Public endpoints
-                                .requestMatchers(
-                                        "/api/auth/login",
-                                        "/api/auth/check-email",
-                                        "/v3/api-docs/**",
-                                        "/swagger-ui.html",
-                                        "/swagger-ui/**",
-                                        "/swagger-resources/**",
-                                        "/webjars/**",
-                                        "/api-docs/**")
-                                .permitAll()
-                                // All other endpoints require authentication
-                                .anyRequest().authenticated())
-                        // Add JWT filter
-                        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                                .cors() // Enable CORS
+                                .and()
+                                .csrf(csrf -> csrf.disable())
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                // Public endpoints
+                                                .requestMatchers(
+                                                                "/api/auth/login",
+                                                                "/api/auth/check-email",
+                                                                "/v3/api-docs/**",
+                                                                "/swagger-ui.html",
+                                                                "/swagger-ui/**",
+                                                                "/swagger-resources/**",
+                                                                "/webjars/**",
+                                                                "/api-docs/**",
+                                                                "/profile-images/**") // <-- allow public access to
+                                                                                      // images
+                                                .permitAll()
+                                                // All other endpoints require authentication
+                                                .anyRequest().authenticated())
+                                // Add JWT filter
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
         }

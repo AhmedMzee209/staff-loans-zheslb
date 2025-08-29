@@ -1,5 +1,15 @@
-
 package com.zheslb.staffloan.controller;
+
+import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.StringUtils;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 import com.zheslb.staffloan.dto.StaffProfileDto;
 import com.zheslb.staffloan.service.StaffProfileService;
@@ -25,6 +35,44 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Staff Profile Management", description = "APIs for managing staff profiles in the loan system")
 public class StaffProfileController {
+
+        private static final Logger logger = LoggerFactory.getLogger(StaffProfileController.class);
+
+        // Profile image upload endpoint
+        @PostMapping(value = "/{id}/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
+        public ResponseEntity<String> uploadProfileImage(
+                        @PathVariable UUID id,
+                        @RequestParam("file") MultipartFile file) throws IOException {
+                logger.info("Received image upload for profile ID: {}", id);
+                // Validate file type
+                String ext = StringUtils.getFilenameExtension(file.getOriginalFilename());
+                if (ext == null || !ext.equalsIgnoreCase("jpg")) {
+                        logger.warn("Rejected upload: not a JPG file");
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only JPG images are allowed.");
+                }
+                // Validate image dimensions
+                BufferedImage img = ImageIO.read(file.getInputStream());
+                if (img == null || img.getWidth() != 120 || img.getHeight() != 150) {
+                        logger.warn("Rejected upload: invalid image dimensions {}x{}",
+                                        img != null ? img.getWidth() : -1, img != null ? img.getHeight() : -1);
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image must be 120x150 pixels.");
+                }
+                // Save file
+                String fileName = "profile_" + id + ".jpg";
+                String uploadDir = "/home/anonymous/DEV/zheslb_loans/backend/uploads/profile-images/";
+                File dir = new File(uploadDir);
+                if (!dir.exists()) {
+                        dir.mkdirs();
+                }
+                File dest = new File(uploadDir + fileName);
+                logger.info("Saving image to {}", dest.getAbsolutePath());
+                file.transferTo(dest);
+                logger.info("Image saved successfully");
+                // Update profile entity
+                staffProfileService.updateProfileImage(id, fileName);
+                return ResponseEntity.ok(fileName);
+        }
 
         private final StaffProfileService staffProfileService;
 

@@ -18,6 +18,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StaffProfileService {
 
+    // Update only the profile image
+    public void updateProfileImage(UUID profileId, String fileName) {
+        StaffProfile profile = staffProfileRepository.findById(profileId)
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
+        profile.setProfileImage(fileName);
+        staffProfileRepository.save(profile);
+    }
+
     private final StaffProfileRepository staffProfileRepository;
     private final UserRepository userRepository;
 
@@ -82,6 +90,7 @@ public class StaffProfileService {
     // =======================
     // 🔁 Mapping Methods
     // =======================
+
     private StaffProfileDto mapEntityToDto(StaffProfile profile) {
         StaffProfileDto dto = new StaffProfileDto();
         dto.setProfileId(profile.getProfileId());
@@ -93,6 +102,7 @@ public class StaffProfileService {
         dto.setZanzibarId(profile.getZanzibarId());
         dto.setSalaryNumber(profile.getSalaryNumber());
         dto.setZssfNumber(profile.getZssfNumber());
+        dto.setProfileImage(profile.getProfileImage());
         return dto;
     }
 
@@ -105,5 +115,6 @@ public class StaffProfileService {
         profile.setZanzibarId(dto.getZanzibarId());
         profile.setSalaryNumber(dto.getSalaryNumber());
         profile.setZssfNumber(dto.getZssfNumber());
+        profile.setProfileImage(dto.getProfileImage());
     }
 }
