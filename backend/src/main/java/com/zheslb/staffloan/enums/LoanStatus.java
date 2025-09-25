@@ -2,6 +2,7 @@ package com.zheslb.staffloan.enums;
 
 public enum LoanStatus {
     DRAFT,
+    SUBMITTED,
     HOD_REVIEW,
     ACCOUNTANT_REVIEW,
     CEO_REVIEW,

@@ -26,4 +26,6 @@ public class LoanApplicationResponseDTO {
     private Instant updatedAt;
 
     private LoanApplicationDetailsResponseDTO details;
+
+    private com.zheslb.staffloan.enums.PriorityLevel priority;
 }

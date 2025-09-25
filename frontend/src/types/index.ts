@@ -2,15 +2,27 @@
 export interface User {
   userId: string;
   email: string;
-  role: RoleInfo;
+  role: RoleInfo; // Legacy single role for backward compatibility
   isActive: boolean;
   createdAt: string;
+  updatedAt?: string;
+  primaryRole?: RoleInfo;
+  roles?: UserRoleDetails[];
 }
 
 export interface RoleInfo {
   roleId: string;
   roleName: string;
   description: string;
+}
+
+export interface UserRoleDetails {
+  userRoleId: string;
+  role: RoleInfo;
+  assignedAt: string;
+  assignedBy: string;
+  assignedByEmail: string;
+  isActive: boolean;
 }
 
 export interface LoginCredentials {

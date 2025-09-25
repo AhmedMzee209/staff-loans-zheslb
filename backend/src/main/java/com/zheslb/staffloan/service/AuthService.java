@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuditLogService auditLogService;
+    private final RoleManagementService roleManagementService;
 
     /**
      * Authenticate user and generate JWT token
@@ -86,15 +88,19 @@ public class AuthService {
             throw new RuntimeException("Email is already taken!");
         }
 
-        // Get the role
-        Role role = roleRepository.findById(registerRequest.getRoleId())
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+        // Get the primary role (might not be STAFF)
+        Role primaryRole = roleRepository.findById(registerRequest.getRoleId())
+                .orElseThrow(() -> new ResourceNotFoundException("Primary role not found"));
 
-        // Create new user
+        // Ensure STAFF role exists and get it for default assignment
+        Role staffRole = roleRepository.findByRoleName("STAFF")
+                .orElseThrow(() -> new ResourceNotFoundException("STAFF role not found in system"));
+
+        // Create new user with primary role
         User user = User.builder()
                 .email(registerRequest.getEmail())
                 .passwordHash(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(role)
+                .role(primaryRole) // Set the requested role as primary
                 .isActive(registerRequest.getIsActive())
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
@@ -104,6 +110,35 @@ public class AuthService {
 
         // Get current admin user for audit logging
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID assignedByUserId = null;
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetailsService.UserPrincipal) {
+            CustomUserDetailsService.UserPrincipal principal = (CustomUserDetailsService.UserPrincipal) authentication
+                    .getPrincipal();
+            assignedByUserId = UUID.fromString(principal.getUserId());
+        }
+
+        // Always assign STAFF role to all users (required by business logic)
+        try {
+            roleManagementService.assignRoleToUser(savedUser.getUserId(), staffRole.getRoleId(), assignedByUserId);
+        } catch (IllegalArgumentException e) {
+            // If user already has STAFF role (shouldn't happen in registration), log and continue
+            log.debug("User {} already has STAFF role during registration", savedUser.getEmail());
+        }
+
+        // If the primary role is not STAFF, assign the primary role as well
+        if (!primaryRole.getRoleName().equals("STAFF")) {
+            try {
+                roleManagementService.assignRoleToUser(savedUser.getUserId(), primaryRole.getRoleId(), assignedByUserId);
+            } catch (IllegalArgumentException e) {
+                // If user already has this role, log and continue
+                log.debug("User {} already has {} role during registration", savedUser.getEmail(), primaryRole.getRoleName());
+            }
+        }
+
+        // Refresh user to get updated role assignments
+        savedUser = userRepository.findById(savedUser.getUserId()).orElse(savedUser);
+
+        // Audit logging for user creation
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetailsService.UserPrincipal) {
             CustomUserDetailsService.UserPrincipal principal = (CustomUserDetailsService.UserPrincipal) authentication
                     .getPrincipal();

@@ -12,6 +12,7 @@
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/LoanApplicationController.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/LoanApplicationDetailsController.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/RoleController.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/RoleManagementController.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/StaffApprovalController.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/StaffProfileController.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/controller/UserController.java
@@ -36,10 +37,12 @@
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/request/LoginRequestDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/request/RegisterRequestDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/request/StaffApprovalRequestDTO.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/request/UserRoleAssignmentDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/AdminStatsResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/ApprovalStageResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/AuditLogResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/AuthResponseDTO.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/CEOStatsResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/ContractResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/ContractVersionResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/CurrentUserDTO.java
@@ -47,8 +50,10 @@
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/LoanApplicationDetailsResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/LoanApplicationResponseDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/StaffApprovalResponseDTO.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/dto/response/UserWithRolesDTO.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/enums/DocumentType.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/enums/LoanStatus.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/enums/PriorityLevel.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/enums/StageStatus.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/enums/StageType.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/exception/ResourceNotFoundException.java
@@ -63,6 +68,7 @@
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/model/StaffApproval.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/model/StaffProfile.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/model/User.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/model/UserRole.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/ApprovalStageRepository.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/AuditLogRepository.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/ContractRepository.java
@@ -75,6 +81,7 @@
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/StaffProfileRepository.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/StaffProfileRepositoryCustom.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/UserRepository.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/repository/UserRoleRepository.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/security/CustomUserDetailsService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/security/JwtAuthenticationFilter.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/security/JwtTokenProvider.java
@@ -87,7 +94,9 @@
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/DocumentService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/LoanApplicationDetailsService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/LoanApplicationService.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/RoleManagementService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/RoleService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/StaffApprovalService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/StaffProfileService.java
+/home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/UserRoleInitializationService.java
 /home/anonymous/DEV/zheslb_loans/backend/src/main/java/com/zheslb/staffloan/service/UserService.java

@@ -16,6 +16,9 @@ public interface ApprovalStageRepository extends JpaRepository<ApprovalStage, UU
     // Find stage by application and type
     List<ApprovalStage> findByApplication_ApplicationIdAndStageType(UUID applicationId, StageType stageType);
 
+    // Find single stage by application and type
+    java.util.Optional<ApprovalStage> findByApplicationAndStageType(com.zheslb.staffloan.model.LoanApplication application, StageType stageType);
+
     // Find pending stages
     List<ApprovalStage> findByStatus(StageStatus status);
 

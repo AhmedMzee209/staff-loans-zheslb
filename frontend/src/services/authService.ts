@@ -1,5 +1,5 @@
 import apiService from './api';
-import { USER_ROLES, type UserRole, ROLE_DASHBOARDS } from '../constants/roles';
+import { USER_ROLES, type UserRole, ROLE_DASHBOARDS, ROLE_DISPLAY_NAMES } from '../constants/roles';
 import type { User, LoginCredentials, AuthResponse } from '../types';
 
 class AuthService {
@@ -92,9 +92,25 @@ class AuthService {
   }
 
   setUser(user: User): void {
+    // Normalize legacy role name for backward compatibility
     if (user && user.role && user.role.roleName) {
       user.role.roleName = user.role.roleName.trim().toUpperCase();
     }
+    
+    // Normalize primary role name if exists
+    if (user && user.primaryRole && user.primaryRole.roleName) {
+      user.primaryRole.roleName = user.primaryRole.roleName.trim().toUpperCase();
+    }
+    
+    // Normalize all role names in the roles array
+    if (user && user.roles) {
+      user.roles.forEach(roleDetail => {
+        if (roleDetail.role && roleDetail.role.roleName) {
+          roleDetail.role.roleName = roleDetail.role.roleName.trim().toUpperCase();
+        }
+      });
+    }
+    
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
   }
 
@@ -110,25 +126,105 @@ class AuthService {
 
   hasRole(role: UserRole): boolean {
     const user = this.getUser();
-    return user?.role.roleName === role;
+    if (!user) return false;
+    
+    // Check in multiple roles if available
+    if (user.roles && user.roles.length > 0) {
+      return user.roles.some(roleDetail => 
+        roleDetail.role.roleName === role && roleDetail.isActive
+      );
+    }
+    
+    // Fallback to legacy single role
+    return user.role?.roleName === role;
   }
 
   hasAnyRole(roles: UserRole[]): boolean {
     const user = this.getUser();
-    return user ? roles.includes(user.role.roleName as UserRole) : false;
+    if (!user) return false;
+    
+    // Check in multiple roles if available
+    if (user.roles && user.roles.length > 0) {
+      return user.roles.some(roleDetail => 
+        roles.includes(roleDetail.role.roleName as UserRole) && roleDetail.isActive
+      );
+    }
+    
+    // Fallback to legacy single role
+    return user.role ? roles.includes(user.role.roleName as UserRole) : false;
   }
 
   getCurrentUserRole(): UserRole | null {
     const user = this.getUser();
-    return user ? (user.role.roleName as UserRole) : null;
+    if (!user) return null;
+    
+    // Return primary role if available
+    if (user.primaryRole) {
+      return user.primaryRole.roleName as UserRole;
+    }
+    
+    // Fallback to legacy single role
+    return user.role ? (user.role.roleName as UserRole) : null;
+  }
+
+  // Get all active roles for the current user
+  getCurrentUserRoles(): UserRole[] {
+    const user = this.getUser();
+    if (!user) return [];
+    
+    if (user.roles && user.roles.length > 0) {
+      return user.roles
+        .filter(roleDetail => roleDetail.isActive)
+        .map(roleDetail => roleDetail.role.roleName as UserRole);
+    }
+    
+    // Fallback to legacy single role
+    return user.role ? [user.role.roleName as UserRole] : [];
+  }
+
+  // Get primary role, with fallback to first active role
+  getPrimaryRole(): UserRole | null {
+    const user = this.getUser();
+    if (!user) return null;
+    
+    // Return primary role if set
+    if (user.primaryRole) {
+      return user.primaryRole.roleName as UserRole;
+    }
+    
+    // Fallback to first active role
+    if (user.roles && user.roles.length > 0) {
+      const firstActiveRole = user.roles.find(roleDetail => roleDetail.isActive);
+      if (firstActiveRole) {
+        return firstActiveRole.role.roleName as UserRole;
+      }
+    }
+    
+    // Fallback to legacy single role
+    return user.role ? (user.role.roleName as UserRole) : null;
   }
 
   getDashboardPath(): string {
-    const role = this.getCurrentUserRole();
+    const role = this.getPrimaryRole();
     return role ? ROLE_DASHBOARDS[role] : '/login';
   }
 
-  // Role checking methods
+  // Get unified dashboard path (for backward compatibility)
+  getUnifiedDashboardPath(): string {
+    return '/dashboard';
+  }
+
+  // Get all accessible dashboard paths based on user's roles
+  getAccessibleDashboards(): Array<{ role: UserRole; path: string; displayName: string }> {
+    const roles = this.getCurrentUserRoles();
+    return roles.map(role => ({
+      role,
+      path: ROLE_DASHBOARDS[role],
+      displayName: ROLE_DISPLAY_NAMES[role] || role
+    }));
+  }
+
+  // Role checking methods (updated for multi-role support)
   isAdmin(): boolean {
     return this.hasRole(USER_ROLES.ADMIN);
   }
@@ -163,6 +259,42 @@ class AuthService {
 
   isSecretary(): boolean {
     return this.hasRole(USER_ROLES.SECRETARY);
+  }
+
+  // Enhanced role checking - check if user has management roles
+  hasManagementRole(): boolean {
+    return this.hasAnyRole([
+      USER_ROLES.ADMIN,
+      USER_ROLES.CEO,
+      USER_ROLES.HOD,
+      USER_ROLES.MANAGER,
+      USER_ROLES.CO
+    ]);
+  }
+
+  // Check if user has financial roles
+  hasFinancialRole(): boolean {
+    return this.hasAnyRole([
+      USER_ROLES.ACCOUNTANT,
+      USER_ROLES.AUDITOR,
+      USER_ROLES.CEO,
+      USER_ROLES.CO
+    ]);
+  }
+
+  // Check if user can apply for loans (all users with STAFF role can)
+  canApplyForLoans(): boolean {
+    return this.isStaff();
+  }
+
+  // Check if user can approve loans
+  canApproveLoans(): boolean {
+    return this.hasAnyRole([
+      USER_ROLES.HOD,
+      USER_ROLES.MANAGER,
+      USER_ROLES.CEO,
+      USER_ROLES.CO
+    ]);
   }
 }
 

@@ -25,6 +25,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -41,13 +42,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String username = jwtTokenProvider.getUsernameFromToken(jwt);
                     log.debug("Username from JWT: {}", username);
 
+                    // Optionally read roles from token (not strictly needed when loading user)
                     List<String> roles = jwtTokenProvider.getRolesFromToken(jwt);
-                    List<GrantedAuthority> authorities = roles != null ? roles.stream()
+                    List<GrantedAuthority> tokenAuthorities = roles != null ? roles.stream()
                             .map(SimpleGrantedAuthority::new)
                             .collect(Collectors.toList()) : List.of();
 
+                    // Load full UserDetails so that principal is UserPrincipal (with userId available)
+                    org.springframework.security.core.userdetails.UserDetails userDetails =
+                            customUserDetailsService.loadUserByUsername(username);
+
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            username, null, authorities);
+                            userDetails, null, userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()
+                                    ? userDetails.getAuthorities()
+                                    : tokenAuthorities);
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -1,9 +1,53 @@
 import React from 'react';
+import NewApplicationModal from './NewApplicationModal';
+import { useAuth } from '../../context/AuthContext';
 import { FileText, Eye } from 'lucide-react';
 
 const MyApplications: React.FC = () => {
-  // Placeholder data - will be replaced with real API calls
-  const placeholderApplications: any[] = [];
+  const { user } = useAuth();
+  const [showModal, setShowModal] = React.useState(false);
+  const [applications, setApplications] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string>("");
+
+  React.useEffect(() => {
+    const fetchApplications = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const loanService = (await import('../../services/loanService')).default;
+        const data = await loanService.getMyApplications();
+        // sort newest first by submittedAt if present
+        const sorted = [...(data || [])].sort((a, b) => {
+          const da = a?.submittedAt ? new Date(a.submittedAt).getTime() : 0;
+          const db = b?.submittedAt ? new Date(b.submittedAt).getTime() : 0;
+          return db - da;
+        });
+        setApplications(sorted);
+      } catch (err: any) {
+        setError('Failed to fetch applications.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchApplications();
+  }, []);
+
+    const handleApplicationSubmitted = () => {
+      setShowModal(false);
+      // Refresh applications after submit
+      const fetchApplications = async () => {
+        const loanService = (await import('../../services/loanService')).default;
+        const data = await loanService.getMyApplications();
+        const sorted = [...(data || [])].sort((a, b) => {
+          const da = a?.submittedAt ? new Date(a.submittedAt).getTime() : 0;
+          const db = b?.submittedAt ? new Date(b.submittedAt).getTime() : 0;
+          return db - da;
+        });
+        setApplications(sorted);
+      };
+      fetchApplications();
+    };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -16,74 +60,81 @@ const MyApplications: React.FC = () => {
   };
 
   const formatAmount = (amount: number) =>
-    new Intl.NumberFormat('en-TZ', { style: 'currency', currency: 'TZS', minimumFractionDigits: 0 }).format(amount);
+    new Intl.NumberFormat('en-TZ', { style: 'currency', currency: 'TZS', minimumFractionDigits: 0 }).format(Number.isFinite(amount) ? amount : 0);
+
+  const formatDate = (value?: string) => {
+    if (!value) return '—';
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? '—' : d.toLocaleDateString();
+  };
+
+  const humanize = (text?: string) => (text ? text.replace(/_/g, ' ') : '—');
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-900">My Loan Applications</h2>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          onClick={() => setShowModal(true)}
+        >
           New Application
         </button>
       </div>
+      <NewApplicationModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onApplicationSubmitted={handleApplicationSubmitted}
+        staffId={user?.userId}
+      />
 
-      {placeholderApplications.length === 0 ? (
+      {loading ? (
+        <div className="bg-white rounded-lg shadow-sm p-12 text-center">Loading...</div>
+      ) : error ? (
+        <div className="bg-white rounded-lg shadow-sm p-12 text-center text-red-600">{error}</div>
+      ) : applications.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm p-12 text-center">
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No Applications Yet</h3>
           <p className="text-gray-600 mb-4">You haven't submitted any loan applications yet.</p>
-          <p className="text-sm text-gray-500 mb-4">Connect to backend to view real data</p>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-            Submit Your First Application
-          </button>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Application History</h3>
-          </div>
-          <div className="divide-y divide-gray-200">
-            {placeholderApplications.map((application) => (
-              <div key={application.id} className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h4 className="font-medium text-gray-900">
-                        Application #{application.id}
-                      </h4>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(application.status)}`}>
-                        {application.status.replace('_', ' ')}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                      <div>
-                        <span className="font-medium">Amount:</span> {formatAmount(application.amount || 0)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Purpose:</span> {application.purpose || 'Loan Purpose'}
-                      </div>
-                      <div>
-                        <span className="font-medium">Term:</span> {application.term || 12} months
-                      </div>
-                    </div>
-                    <div className="mt-2 text-xs text-gray-500">
-                      Submitted: {new Date(application.submittedAt || Date.now()).toLocaleDateString()}
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                      <Eye className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Application #</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Requested</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Review Stage</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Submitted</th>
+                <th className="px-6 py-3"></th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {applications.map((application, idx) => (
+                <tr key={application.id || application.applicationId} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{idx + 1}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{formatAmount(Number(application.amount))}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{application.purpose || '—'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(application.status)}`}>{humanize(application.status)}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{application.reviewStage || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{formatDate(application.submittedAt)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors"><Eye className="h-4 w-4" /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
       {/* Status Legend */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Status Legend</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex items-center space-x-2">

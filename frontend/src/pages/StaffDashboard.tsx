@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import MyApplications from './staff/MyApplications';
 import { Mail, FileText, User, CheckCircle, Clock, Eye } from 'lucide-react';
   // Utility: get status color for badge
   const getStatusColor = (status: string) => {
@@ -122,12 +123,21 @@ const StaffDashboard: React.FC = () => {
     },
   ];
 
-  const applications = [
-    { id: 1, type: 'Personal Loan', status: 'Pending', date: '2025-08-01' },
-    { id: 2, type: 'Car Loan', status: 'Under Review', date: '2025-08-10' },
-    { id: 3, type: 'Home Loan', status: 'Completed', date: '2025-07-15' },
-    { id: 4, type: 'Education Loan', status: 'Pending', date: '2025-08-20' },
-  ];
+  const [applications, setApplications] = useState<any[]>([]);
+
+  const fetchApplications = async () => {
+    const loanService = (await import('../services/loanService')).default;
+    const apps = await loanService.getMyApplications();
+    setApplications(apps);
+  };
+
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  const handleApplicationSubmitted = () => {
+    fetchApplications();
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -199,51 +209,7 @@ const StaffDashboard: React.FC = () => {
           </>
         );
       case 'applications':
-        return (
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-800">My Applications</h2>
-              <button
-                onClick={() => setShowNewApplication(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg shadow transition"
-              >
-                + New Application
-              </button>
-            </div>
-            <div className="overflow-x-auto rounded-lg shadow">
-              <table className="min-w-full bg-white">
-                <thead>
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {applications.map((app) => (
-                    <tr key={app.id} className="border-b hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-800">{app.type}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            app.status === 'Completed'
-                              ? 'bg-green-100 text-green-700'
-                              : app.status === 'Pending'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-purple-100 text-purple-700'
-                          }`}
-                        >
-                          {app.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">{app.date}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        );
+        return <MyApplications />;
       case 'profile':
         return <Profile />;
       default:
@@ -292,11 +258,14 @@ const StaffDashboard: React.FC = () => {
         <NewApplicationModal
           isOpen={showNewApplication}
           onClose={() => setShowNewApplication(false)}
+          onApplicationSubmitted={handleApplicationSubmitted}
+          staffId={user?.userId}
         />
 
         <ProfileModal
           isOpen={showProfileModal}
           onClose={handleProfileModalClose}
+          mode="edit"
         />
         {/* Optionally, block UI if profile is loading or incomplete */}
         {profileLoading && (

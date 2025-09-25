@@ -2,18 +2,11 @@ import apiService from './api';
 import type { LoanApplication, LoanApplicationDetails, Document, Contract, ApprovalStage } from '../types';
 
 export interface CreateLoanApplicationRequest {
-  amount: number;
-  purpose: string;
-  term: number;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  employmentType: string;
-  employerName: string;
-  employmentDuration: number;
-  collateral: string;
-  guarantorName: string;
-  guarantorPhone: string;
-  guarantorRelationship: string;
+  requestedAmount: number;
+  loanPurpose: string;
+  monthlyDeduction: number;
+  deductionPeriod: number;
+  staffId: string;
 }
 
 export interface UpdateLoanApplicationRequest extends Partial<CreateLoanApplicationRequest> {
@@ -21,9 +14,25 @@ export interface UpdateLoanApplicationRequest extends Partial<CreateLoanApplicat
 }
 
 class LoanService {
-  // Get all loan applications for the current user
+  // Get all loan applications for the current user with details
   async getMyApplications(): Promise<LoanApplication[]> {
-    return apiService.get<LoanApplication[]>('/loan-applications/my');
+    const raw = await apiService.get<any[]>('/loan-applications/getMyLoanApplicationsWithDetails');
+    // Map backend DTO -> frontend LoanApplication shape
+    return (raw || []).map((app: any) => {
+      const details = app.details || {};
+      const createdAt: string | undefined = app.createdAt;
+      const updatedAt: string | undefined = app.updatedAt;
+      return {
+        id: app.applicationId ?? app.id ?? '',
+        applicantId: app.staffId ?? app.applicantId ?? '',
+        amount: Number(details.requestedAmount ?? app.amount ?? 0),
+        purpose: details.loanPurpose ?? app.purpose ?? '',
+        term: Number(details.deductionPeriod ?? app.term ?? 0),
+        status: app.status ?? 'PENDING',
+        submittedAt: createdAt ?? app.submittedAt ?? '',
+        updatedAt: updatedAt ?? app.updatedAt ?? ''
+      } as LoanApplication;
+    });
   }
 
   // Get all loan applications (for admin/manager roles)

@@ -38,6 +38,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public static class UserPrincipal implements UserDetails {
+        // Returns the user's UUID
+        public java.util.UUID getId() {
+            return java.util.UUID.fromString(userId);
+        }
         private String userId;
         private String email;
         private String password;
@@ -54,8 +58,27 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         public static UserPrincipal create(User user) {
-            Collection<GrantedAuthority> authorities = Collections.singletonList(
-                    new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName().toUpperCase()));
+            // Get all active roles for the user
+            Collection<GrantedAuthority> authorities = new java.util.ArrayList<>();
+            
+            // Add authorities from userRoles (new multi-role system)
+            if (user.getUserRoles() != null && !user.getUserRoles().isEmpty()) {
+                for (com.zheslb.staffloan.model.UserRole userRole : user.getUserRoles()) {
+                    if (userRole.getIsActive() && userRole.getRole() != null) {
+                        authorities.add(new SimpleGrantedAuthority("ROLE_" + userRole.getRole().getRoleName().toUpperCase()));
+                    }
+                }
+            }
+            
+            // Fallback to single role for backward compatibility
+            if (authorities.isEmpty() && user.getRole() != null) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName().toUpperCase()));
+            }
+            
+            // Ensure at least STAFF role if no roles found
+            if (authorities.isEmpty()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_STAFF"));
+            }
 
             return new UserPrincipal(
                     user.getUserId().toString(),

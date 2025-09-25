@@ -35,6 +35,10 @@ public class LoanApplication {
     @OneToOne(mappedBy = "loanApplication", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private LoanApplicationDetails details;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority")
+    private com.zheslb.staffloan.enums.PriorityLevel priority;
+
     @Column(name = "created_at", nullable = false)
     @Builder.Default
     private Instant createdAt = Instant.now();
