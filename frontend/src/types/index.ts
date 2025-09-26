@@ -128,7 +128,7 @@ export interface StaffProfile {
 }
 
 // Enums
-export type LoanStatus = 'PENDING' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED' | 'DISBURSED' | 'COMPLETED' | 'CANCELLED';
+export type LoanStatus = 'DRAFT' | 'SUBMITTED' | 'HOD_REVIEW' | 'ACCOUNTANT_REVIEW' | 'CEO_REVIEW' | 'LEGAL_REVIEW' | 'APPROVED' | 'REJECTED';
 export type DocumentType = 'NATIONAL_ID' | 'PAYSLIP' | 'BANK_STATEMENT' | 'EMPLOYMENT_LETTER' | 'OTHER';
 export type DocumentStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export type ContractStatus = 'DRAFT' | 'PENDING_SIGNATURE' | 'SIGNED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';

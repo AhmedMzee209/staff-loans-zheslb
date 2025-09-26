@@ -1,5 +1,5 @@
 import apiService from './api';
-import type { LoanApplication, LoanApplicationDetails, Document, Contract, ApprovalStage } from '../types';
+import type { LoanApplication, LoanApplicationDetails, Document, Contract, ApprovalStage, LoanStatus } from '../types';
 
 export interface CreateLoanApplicationRequest {
   requestedAmount: number;
@@ -7,6 +7,7 @@ export interface CreateLoanApplicationRequest {
   monthlyDeduction: number;
   deductionPeriod: number;
   staffId: string;
+  status?: LoanStatus;
 }
 
 export interface UpdateLoanApplicationRequest extends Partial<CreateLoanApplicationRequest> {

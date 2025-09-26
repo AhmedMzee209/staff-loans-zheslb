@@ -5,18 +5,14 @@ import StrategicOverview from './ceo/StrategicOverview';
 import PendingApproval from './ceo/PendingApproval';
 import ApprovedLoans from './ceo/ApprovedLoans';
 import RejectedLoans from './ceo/RejectedLoans';
-import OrganizationalAnalytics from './ceo/OrganizationalAnalytics';
-import ComplianceRisk from './ceo/ComplianceRisk';
 import ApprovalModal from './ceo/ApprovalModal';
-import { BarChart3, FileText, CheckCircle, XCircle, TrendingUp, Shield } from 'lucide-react';
+import { BarChart3, FileText, CheckCircle, XCircle } from 'lucide-react';
 
 const tabs = [
-  { id: 'overview', label: 'Strategic Overview', icon: BarChart3 },
+  { id: 'overview', label: 'Overview', icon: BarChart3 },
   { id: 'pending', label: 'Pending Approval', icon: FileText },
   { id: 'approved', label: 'Approved Loans', icon: CheckCircle },
-  { id: 'rejected', label: 'Rejected Loans', icon: XCircle },
-  { id: 'analytics', label: 'Organizational Analytics', icon: TrendingUp },
-  { id: 'compliance', label: 'Compliance & Risk', icon: Shield }
+  { id: 'rejected', label: 'Rejected Loans', icon: XCircle }
 ];
 
 const CEODashboard: React.FC = () => {
@@ -51,10 +47,6 @@ const CEODashboard: React.FC = () => {
         return <ApprovedLoans />;
       case 'rejected':
         return <RejectedLoans />;
-      case 'analytics':
-        return <OrganizationalAnalytics />;
-      case 'compliance':
-        return <ComplianceRisk />;
       default:
         return <StrategicOverview />;
     }

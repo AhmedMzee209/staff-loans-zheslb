@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, Mail, Lock, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
-import logo from './../../dist/assets/images/logo.png';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 
@@ -17,9 +16,23 @@ const Login: React.FC = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (user) {
-      // Use your dashboard path logic for role-based dashboards
-      navigate(authService.getDashboardPath(), { replace: true });
+    if (user && user.role) {
+      try {
+        // Use your dashboard path logic for role-based dashboards
+        const dashboardPath = authService.getDashboardPath();
+        if (dashboardPath && dashboardPath !== '/login') {
+          navigate(dashboardPath, { replace: true });
+        }
+      } catch (error) {
+        console.error('Error getting dashboard path:', error);
+        // Fallback based on user role
+        const roleName = user.role.roleName?.toLowerCase();
+        if (roleName) {
+          navigate(`/${roleName}`, { replace: true });
+        } else {
+          navigate('/dashboard', { replace: true });
+        }
+      }
     }
   }, [user, navigate]);
 
@@ -32,7 +45,19 @@ const Login: React.FC = () => {
       const response = await authService.login({ email, password });
       if (response && response.accessToken && response.user) {
         contextLogin(response.user, response.accessToken);
-        navigate(authService.getDashboardPath(), { replace: true });
+        try {
+          const dashboardPath = authService.getDashboardPath();
+          navigate(dashboardPath, { replace: true });
+        } catch (error) {
+          console.error('Error getting dashboard path after login:', error);
+          // Fallback based on user role
+          const roleName = response.user.role?.roleName?.toLowerCase();
+          if (roleName) {
+            navigate(`/${roleName}`, { replace: true });
+          } else {
+            navigate('/dashboard', { replace: true });
+          }
+        }
       } else {
         setError('Invalid email or password');
       }
@@ -89,8 +114,8 @@ const Login: React.FC = () => {
           <div className="w-full max-w-sm">
             {/* Logo / brand */}
             <div className="flex flex-col items-center mb-6">
-              <div className="h-32 w-32 rounded-full overflow-hidden ring-2 ring-blue-400/20 shadow-inner bg-white">
-                <img src={logo} alt="ZHELSB" className="h-30 w-30 object-cover rounded-full " />
+              <div className="h-32 w-32 rounded-full overflow-hidden ring-2 ring-blue-400/20 shadow-inner bg-white flex items-center justify-center">
+                <LogIn className="h-16 w-16 text-blue-600" />
               </div>
               <p className="mt-2  text-xl text-yellow-400">Staff Loan Management System</p>
             </div>

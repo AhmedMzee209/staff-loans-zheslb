@@ -33,6 +33,7 @@ const NewApplicationModal: React.FC<NewApplicationModalProps> = ({ isOpen, onClo
         monthlyDeduction,
         deductionPeriod,
         staffId: user?.userId ?? '',
+        status: 'SUBMITTED' // Set status to SUBMITTED when staff submits application
       });
       setShowSuccessBox(true);
       setTimeout(() => {
