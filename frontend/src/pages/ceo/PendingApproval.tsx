@@ -93,6 +93,7 @@ const PendingApproval: React.FC = () => {
       const allApplications = await loanService.getAllApplications();
       console.log('All applications from backend:', allApplications);
       console.log('Total applications:', allApplications?.length || 0);
+      console.log('Sample application structure:', allApplications?.[0]);
       
       if (!allApplications || !Array.isArray(allApplications)) {
         console.warn('Invalid response from backend:', allApplications);
@@ -129,13 +130,15 @@ const PendingApproval: React.FC = () => {
           
           try {
             // Fetch real applicant profile data
+            console.log(`Fetching profile for applicant: ${app.applicantId}`);
             const userProfile = await userService.getUserProfile(app.applicantId);
-            applicantName = `${userProfile.firstName} ${userProfile.lastName}`;
-            applicantEmail = userProfile.userEmail || `${userProfile.firstName.toLowerCase()}.${userProfile.lastName.toLowerCase()}@zheslb.co.tz`;
+            console.log(`Profile fetched for ${app.applicantId}:`, userProfile);
+            applicantName = `${userProfile.firstName || 'Unknown'} ${userProfile.lastName || 'User'}`;
+            applicantEmail = userProfile.userEmail || `${(userProfile.firstName || 'unknown').toLowerCase()}.${(userProfile.lastName || 'user').toLowerCase()}@zheslb.co.tz`;
           } catch (error) {
             console.warn(`Failed to fetch profile for applicant ${app.applicantId}:`, error);
             // Use fallback name if profile fetch fails
-            applicantName = `Staff ${app.applicantId}`;
+            applicantName = `Applicant ${app.applicantId}`;
           }
           
           return {

@@ -38,7 +38,23 @@ class LoanService {
 
   // Get all loan applications (for admin/manager roles)
   async getAllApplications(): Promise<LoanApplication[]> {
-    return apiService.get<LoanApplication[]>('/loan-applications');
+    const raw = await apiService.get<any[]>('/loan-applications');
+    // Map backend DTO -> frontend LoanApplication shape
+    return (raw || []).map((app: any) => {
+      const details = app.details || {};
+      const createdAt: string | undefined = app.createdAt;
+      const updatedAt: string | undefined = app.updatedAt;
+      return {
+        id: app.applicationId ?? app.id ?? '',
+        applicantId: app.staffId ?? app.applicantId ?? '',
+        amount: Number(details.requestedAmount ?? app.amount ?? 0),
+        purpose: details.loanPurpose ?? app.purpose ?? '',
+        term: Number(details.deductionPeriod ?? app.term ?? 0),
+        status: app.status ?? 'DRAFT',
+        submittedAt: createdAt ?? app.submittedAt ?? new Date().toISOString(),
+        updatedAt: updatedAt ?? app.updatedAt ?? new Date().toISOString()
+      } as LoanApplication;
+    });
   }
 
   // Get loan application by ID
