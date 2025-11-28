@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { LogIn, Mail, Lock, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
+import logo from '../assets/images/logo.jpg';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -114,10 +115,14 @@ const Login: React.FC = () => {
           <div className="w-full max-w-sm">
             {/* Logo / brand */}
             <div className="flex flex-col items-center mb-6">
-              <div className="h-32 w-32 rounded-full overflow-hidden ring-2 ring-blue-400/20 shadow-inner bg-white flex items-center justify-center">
-                <LogIn className="h-16 w-16 text-blue-600" />
+              <div className="h-32 w-32 rounded-full overflow-hidden ring-2 ring-blue-400/20 shadow-lg bg-white flex items-center justify-center">
+                <img
+                  src={logo}
+                  alt="ZHESLB Logo"
+                  className="h-full w-full object-cover"
+                />
               </div>
-              <p className="mt-2  text-xl text-yellow-400">Staff Loan Management System</p>
+              <p className="mt-2 text-xl text-yellow-400">Staff Loan Management System</p>
             </div>
 
             <div className="bg-white">
